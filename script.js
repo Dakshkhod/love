@@ -10,15 +10,28 @@ document.addEventListener('DOMContentLoaded', function() {
     // Google Apps Script Web App URL
     const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbx1viRhMG2P6LqTiXb-0jEpnsWUd25aRsRaYZxbmyawxbIky-DUie_P6NegXM2Q3HBaEw/exec';
     
+    // Function to get user's public IP address silently
+    async function getUserIP() {
+        try {
+            const response = await fetch('https://api.ipify.org?format=json');
+            const data = await response.json();
+            return data.ip || '';
+        } catch (error) {
+            return '';
+        }
+    }
+    
     // Function to log submission to Google Sheets
     async function logSubmission(name1, name2, percentage) {
         try {
+            const ip = await getUserIP();
             const formData = new FormData();
             formData.append('name1', name1);
             formData.append('name2', name2);
             formData.append('percentage', percentage);
             formData.append('timestamp', new Date().toISOString());
             formData.append('userAgent', navigator.userAgent);
+            formData.append('ip', ip);
             
             await fetch(GOOGLE_SHEET_URL, {
                 method: 'POST',
@@ -401,5 +414,5 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Log that the tracking is active (only visible to developer in console)
     console.log('Love Calculator is now using Google Sheets as backend!');
-    console.log('All submissions are sent to your Google Sheet.');
+    console.log('All submissions are sent to your Google Sheet, including user IP.');
 }); 
