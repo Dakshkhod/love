@@ -60,6 +60,49 @@
         </div>
     </div>
     
+    <!-- Hidden Developer Panel -->
+    <div id="developerPanel" class="developer-panel hidden">
+        <div class="developer-content">
+            <div class="developer-header">
+                <h2><i class="fas fa-user-shield"></i> Developer Panel</h2>
+                <button id="closeDeveloperPanel" class="close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="developer-stats">
+                <div class="stat-card">
+                    <h3>Total Submissions</h3>
+                    <p id="totalSubmissions">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Today's Submissions</h3>
+                    <p id="todaySubmissions">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Average Percentage</h3>
+                    <p id="averagePercentage">0%</p>
+                </div>
+            </div>
+            
+            <div class="submissions-list">
+                <h3>Recent Submissions</h3>
+                <div id="submissionsTable" class="submissions-table">
+                    <!-- Submissions will be populated here -->
+                </div>
+            </div>
+            
+            <div class="developer-actions">
+                <button id="exportData" class="action-btn">
+                    <i class="fas fa-download"></i> Export Data
+                </button>
+                <button id="clearData" class="action-btn danger">
+                    <i class="fas fa-trash"></i> Clear All Data
+                </button>
+            </div>
+        </div>
+    </div>
+    
     <script src="script.js"></script>
 </body>
 </html> 

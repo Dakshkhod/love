@@ -2,6 +2,179 @@ document.addEventListener('DOMContentLoaded', function() {
     const loveForm = document.getElementById('loveForm');
     const resultDiv = document.getElementById('result');
     const calculateAgainBtn = document.getElementById('calculateAgain');
+    const developerPanel = document.getElementById('developerPanel');
+    const closeDeveloperPanel = document.getElementById('closeDeveloperPanel');
+    const exportDataBtn = document.getElementById('exportData');
+    const clearDataBtn = document.getElementById('clearData');
+    
+    // Google Sheets integration for logging submissions
+    const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+    
+    // Function to log submission to Google Sheets
+    async function logSubmission(name1, name2, percentage) {
+        try {
+            const formData = new FormData();
+            formData.append('name1', name1);
+            formData.append('name2', name2);
+            formData.append('percentage', percentage);
+            formData.append('timestamp', new Date().toISOString());
+            formData.append('userAgent', navigator.userAgent);
+            
+            // Send data to Google Sheets (commented out until you set up the sheet)
+            // await fetch(GOOGLE_SHEET_URL, {
+            //     method: 'POST',
+            //     body: formData
+            // });
+            
+            // For now, log to console (you can see this in browser dev tools)
+            console.log('Submission logged:', {
+                name1: name1,
+                name2: name2,
+                percentage: percentage,
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent
+            });
+            
+            // Also store in localStorage as backup
+            const submissions = JSON.parse(localStorage.getItem('loveCalculatorSubmissions') || '[]');
+            submissions.push({
+                name1: name1,
+                name2: name2,
+                percentage: percentage,
+                timestamp: new Date().toISOString()
+            });
+            localStorage.setItem('loveCalculatorSubmissions', JSON.stringify(submissions));
+            
+        } catch (error) {
+            console.error('Error logging submission:', error);
+        }
+    }
+    
+    // Function to get all submissions
+    function getAllSubmissions() {
+        return JSON.parse(localStorage.getItem('loveCalculatorSubmissions') || '[]');
+    }
+    
+    // Function to update developer panel
+    function updateDeveloperPanel() {
+        const submissions = getAllSubmissions();
+        
+        // Update stats
+        document.getElementById('totalSubmissions').textContent = submissions.length;
+        
+        // Calculate today's submissions
+        const today = new Date().toDateString();
+        const todaySubmissions = submissions.filter(sub => 
+            new Date(sub.timestamp).toDateString() === today
+        ).length;
+        document.getElementById('todaySubmissions').textContent = todaySubmissions;
+        
+        // Calculate average percentage
+        const avgPercentage = submissions.length > 0 
+            ? Math.round(submissions.reduce((sum, sub) => sum + sub.percentage, 0) / submissions.length)
+            : 0;
+        document.getElementById('averagePercentage').textContent = avgPercentage + '%';
+        
+        // Update submissions table
+        const table = document.getElementById('submissionsTable');
+        table.innerHTML = '';
+        
+        if (submissions.length === 0) {
+            table.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">No submissions yet</div>';
+            return;
+        }
+        
+        // Add header
+        const headerRow = document.createElement('div');
+        headerRow.className = 'submission-row header';
+        headerRow.innerHTML = `
+            <div class="submission-cell">Name 1</div>
+            <div class="submission-cell">Name 2</div>
+            <div class="submission-cell">%</div>
+            <div class="submission-cell">Time</div>
+        `;
+        table.appendChild(headerRow);
+        
+        // Add recent submissions (last 20)
+        const recentSubmissions = submissions.slice(-20).reverse();
+        recentSubmissions.forEach(sub => {
+            const row = document.createElement('div');
+            row.className = 'submission-row';
+            row.innerHTML = `
+                <div class="submission-cell">${sub.name1}</div>
+                <div class="submission-cell">${sub.name2}</div>
+                <div class="submission-cell percentage">${sub.percentage}%</div>
+                <div class="submission-cell timestamp">${new Date(sub.timestamp).toLocaleString()}</div>
+            `;
+            table.appendChild(row);
+        });
+    }
+    
+    // Function to show developer panel
+    function showDeveloperPanel() {
+        updateDeveloperPanel();
+        developerPanel.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    // Function to hide developer panel
+    function hideDeveloperPanel() {
+        developerPanel.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+    
+    // Function to export data as CSV
+    function exportData() {
+        const submissions = getAllSubmissions();
+        if (submissions.length === 0) {
+            alert('No data to export');
+            return;
+        }
+        
+        const csvContent = [
+            'Name 1,Name 2,Percentage,Timestamp',
+            ...submissions.map(sub => 
+                `"${sub.name1}","${sub.name2}",${sub.percentage},"${sub.timestamp}"`
+            )
+        ].join('\n');
+        
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `love-calculator-data-${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+    }
+    
+    // Function to clear all data
+    function clearAllData() {
+        if (confirm('Are you sure you want to clear all submission data? This cannot be undone.')) {
+            localStorage.removeItem('loveCalculatorSubmissions');
+            updateDeveloperPanel();
+            alert('All data has been cleared');
+        }
+    }
+    
+    // Keyboard shortcut to open developer panel (Ctrl+Shift+D)
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+            e.preventDefault();
+            showDeveloperPanel();
+        }
+    });
+    
+    // Event listeners for developer panel
+    closeDeveloperPanel.addEventListener('click', hideDeveloperPanel);
+    exportDataBtn.addEventListener('click', exportData);
+    clearDataBtn.addEventListener('click', clearAllData);
+    
+    // Close panel when clicking outside
+    developerPanel.addEventListener('click', function(e) {
+        if (e.target === developerPanel) {
+            hideDeveloperPanel();
+        }
+    });
     
     // Love compatibility descriptions based on percentage ranges
     const loveDescriptions = {
@@ -151,6 +324,10 @@ document.addEventListener('DOMContentLoaded', function() {
         // Simulate calculation delay for dramatic effect
         setTimeout(() => {
             const percentage = calculateLovePercentage(name1, name2);
+            
+            // Log the submission for developer tracking
+            logSubmission(name1, name2, percentage);
+            
             showResult(name1, name2, percentage);
             
             // Reset button
@@ -229,4 +406,25 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(createConfetti, 1500);
         }
     };
+    
+    // Developer functions (accessible from console)
+    window.viewAllSubmissions = function() {
+        const submissions = getAllSubmissions();
+        console.table(submissions);
+        return submissions;
+    };
+    
+    window.clearAllSubmissions = function() {
+        localStorage.removeItem('loveCalculatorSubmissions');
+        console.log('All submissions cleared');
+    };
+    
+    window.showDeveloperPanel = showDeveloperPanel;
+    
+    // Log that the tracking is active (only visible to developer in console)
+    console.log('Love Calculator tracking is active!');
+    console.log('Developer shortcuts:');
+    console.log('- Press Ctrl+Shift+D to open developer panel');
+    console.log('- Use viewAllSubmissions() to see all entries in console');
+    console.log('- Use showDeveloperPanel() to open the panel programmatically');
 }); 
