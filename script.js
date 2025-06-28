@@ -7,8 +7,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const exportDataBtn = document.getElementById('exportData');
     const clearDataBtn = document.getElementById('clearData');
     
-    // Google Sheets integration for logging submissions
-    const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+    // Google Apps Script Web App URL
+    const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbx1viRhMG2P6LqTiXb-0jEpnsWUd25aRsRaYZxbmyawxbIky-DUie_P6NegXM2Q3HBaEw/exec';
     
     // Function to log submission to Google Sheets
     async function logSubmission(name1, name2, percentage) {
@@ -20,37 +20,16 @@ document.addEventListener('DOMContentLoaded', function() {
             formData.append('timestamp', new Date().toISOString());
             formData.append('userAgent', navigator.userAgent);
             
-            // Send data to Google Sheets (commented out until you set up the sheet)
-            // await fetch(GOOGLE_SHEET_URL, {
-            //     method: 'POST',
-            //     body: formData
-            // });
-            
-            // For now, log to console (you can see this in browser dev tools)
-            console.log('Submission logged:', {
-                name1: name1,
-                name2: name2,
-                percentage: percentage,
-                timestamp: new Date().toISOString(),
-                userAgent: navigator.userAgent
+            await fetch(GOOGLE_SHEET_URL, {
+                method: 'POST',
+                body: formData
             });
-            
-            // Also store in localStorage as backup
-            const submissions = JSON.parse(localStorage.getItem('loveCalculatorSubmissions') || '[]');
-            submissions.push({
-                name1: name1,
-                name2: name2,
-                percentage: percentage,
-                timestamp: new Date().toISOString()
-            });
-            localStorage.setItem('loveCalculatorSubmissions', JSON.stringify(submissions));
-            
         } catch (error) {
-            console.error('Error logging submission:', error);
+            console.error('Error logging submission to Google Sheets:', error);
         }
     }
     
-    // Function to get all submissions
+    // Function to get all submissions from localStorage (fallback)
     function getAllSubmissions() {
         return JSON.parse(localStorage.getItem('loveCalculatorSubmissions') || '[]');
     }
@@ -407,24 +386,20 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
     
-    // Developer functions (accessible from console)
+    // Developer functions (for local testing, not needed for Google Sheets backend)
     window.viewAllSubmissions = function() {
-        const submissions = getAllSubmissions();
-        console.table(submissions);
-        return submissions;
+        alert('Submissions are now stored in your Google Sheet!');
     };
     
     window.clearAllSubmissions = function() {
-        localStorage.removeItem('loveCalculatorSubmissions');
-        console.log('All submissions cleared');
+        alert('Submissions are now stored in your Google Sheet!');
     };
     
-    window.showDeveloperPanel = showDeveloperPanel;
+    window.showDeveloperPanel = function() {
+        alert('Submissions are now stored in your Google Sheet!');
+    };
     
     // Log that the tracking is active (only visible to developer in console)
-    console.log('Love Calculator tracking is active!');
-    console.log('Developer shortcuts:');
-    console.log('- Press Ctrl+Shift+D to open developer panel');
-    console.log('- Use viewAllSubmissions() to see all entries in console');
-    console.log('- Use showDeveloperPanel() to open the panel programmatically');
+    console.log('Love Calculator is now using Google Sheets as backend!');
+    console.log('All submissions are sent to your Google Sheet.');
 }); 
