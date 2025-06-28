@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love Calculator 💕</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="calculator-card">
+            <div class="header">
+                <h1><i class="fas fa-heart"></i> Love Calculator</h1>
+                <p>Discover your love compatibility!</p>
+            </div>
+            
+            <form id="loveForm" class="love-form">
+                <div class="input-group">
+                    <label for="name1">First Person's Name</label>
+                    <input type="text" id="name1" name="name1" placeholder="Enter first name" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="name2">Second Person's Name</label>
+                    <input type="text" id="name2" name="name2" placeholder="Enter second name" required>
+                </div>
+                
+                <button type="submit" class="calculate-btn">
+                    <i class="fas fa-magic"></i> Calculate Love
+                </button>
+            </form>
+            
+            <div id="result" class="result hidden">
+                <div class="result-header">
+                    <h2>Love Compatibility</h2>
+                    <div class="names-display">
+                        <span id="displayName1"></span> & <span id="displayName2"></span>
+                    </div>
+                </div>
+                
+                <div class="percentage-container">
+                    <div class="percentage-circle">
+                        <div class="percentage-number">
+                            <span id="percentage">0</span>%
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="description">
+                    <h3 id="resultTitle">Loading...</h3>
+                    <p id="resultDescription">Calculating your love compatibility...</p>
+                </div>
+                
+                <button id="calculateAgain" class="calculate-again-btn">
+                    <i class="fas fa-redo"></i> Calculate Again
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html> 
